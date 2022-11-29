@@ -1,0 +1,18 @@
+{
+  "name": "project_test",
+  "billing": {
+    "cpu_hours": {
+      "alloc": 1000,
+      "used": 750
+    },
+    "gpu_hours": {
+      "alloc": 1000,
+      "used": 500
+    },
+    "storage_hours": {
+      "alloc": 1000,
+      "used": 250
+    }
+  },
+  "title": "Test project"
+}
