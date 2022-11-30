@@ -1,17 +1,17 @@
-from posixpath import split
-from pytest import MonkeyPatch
 from .patches import (
     patch_set_data,
-    patch_set_projects,
+    patch_groups,
     patch_set_projects_with_actual_file,
     patch_set_path,
+    projects,
 )
 from lumi_allocations.data import ProjectInfo
 
 
 class TestConstructor:
-    def test_constructor(self, patch_set_projects, patch_set_data):
-        ProjectInfo()
+    def test_constructor(self, patch_groups, patch_set_data):
+        info = ProjectInfo()
+        assert len(info._projects) == len(projects)
 
     def test_with_projects(self, patch_set_data):
         info = ProjectInfo(projects=["project_1"])
@@ -27,7 +27,7 @@ class TestConstructor:
 
 
 class TestQuotaString:
-    def test_output(self, patch_set_projects, patch_set_data):
+    def test_output(self, patch_groups, patch_set_data):
         info = ProjectInfo()
         used = 1
         alloc = 3

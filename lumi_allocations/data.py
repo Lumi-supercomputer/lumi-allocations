@@ -13,7 +13,7 @@ class ProjectInfo:
         self._path = f"/var/lib/project_info/{'lust' if lust else 'users'}"
 
     def _set_projects(self, projects):
-        if projects is not []:
+        if projects != []:
             self._projects = projects
         else:
             self._projects = [

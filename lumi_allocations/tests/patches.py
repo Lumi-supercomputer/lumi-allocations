@@ -1,20 +1,35 @@
 import pytest
 from pathlib import Path
 import os
+import grp
 
 import lumi_allocations.data
 
 
-@pytest.fixture
-def patch_set_projects(monkeypatch):
-    def mock_set_projects(self, _):
-        self._projects = ["project_1", "project_2", "project_3"]
+def gen_data():
+    return {
+        "billing": {
+            "cpu_hours": {
+                "used": 1,
+                "alloc": 2,
+            },
+            "gpu_hours": {
+                "used": 1,
+                "alloc": 2,
+            },
+            "storage_hours": {
+                "used": 1,
+                "alloc": 2,
+            },
+        }
+    }
 
-    monkeypatch.setattr(
-        lumi_allocations.data.ProjectInfo,
-        "_set_projects",
-        mock_set_projects,
-    )
+
+projects = {
+    "project_1": gen_data(),
+    "project_2": gen_data(),
+    "project_3": gen_data(),
+}
 
 
 @pytest.fixture
@@ -42,32 +57,25 @@ def patch_set_path(monkeypatch):
 
 
 @pytest.fixture
-def patch_set_data(monkeypatch):
-    def gen_data():
-        return {
-            "billing": {
-                "cpu_hours": {
-                    "used": 1,
-                    "alloc": 2,
-                },
-                "gpu_hours": {
-                    "used": 1,
-                    "alloc": 2,
-                },
-                "storage_hours": {
-                    "used": 1,
-                    "alloc": 2,
-                },
-            }
-        }
+def patch_groups(monkeypatch):
+    def mock_os_getgroups():
+        return range(1, len(projects) + 1)
 
+    class MockGrpid:
+        def __init__(self, id):
+            self.gr_name = f"project_{id}"
+
+    def mock_grp_getgrgid(id):
+        return MockGrpid(id)
+
+    monkeypatch.setattr(os, "getgroups", mock_os_getgroups)
+    monkeypatch.setattr(grp, "getgrgid", mock_grp_getgrgid)
+
+
+@pytest.fixture
+def patch_set_data(monkeypatch):
     def mock_set_data(self):
         self._data = {}
-        projects = {
-            "project_1": gen_data(),
-            "project_2": gen_data(),
-            "project_3": gen_data(),
-        }
 
         for project in self._projects:
             self._data[project] = projects[project]
