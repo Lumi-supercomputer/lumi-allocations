@@ -5,7 +5,6 @@ import grp
 
 class ProjectInfo:
     def __init__(self, projects=[], lust=False):
-        print(projects)
         self._set_path(lust)
         self._set_projects(projects)
         self._set_data()
