@@ -35,10 +35,13 @@ def main():
     if args.all is True:
         # get all projects through listing /projappl and filtering out non-existing projects
         for path in os.listdir(projdir):
-            if os.path.islink(os.path.join(projdir, path)) and path not in not_a_project:
+            if (
+                os.path.islink(os.path.join(projdir, path))
+                and path not in not_a_project
+            ):
                 projects.append(path)
         projects.sort()
     else:
         projects = [] if args.projects == "" else args.projects.split(",")
-    info = ProjectInfo(projects, args.lust, args.sort)
+    info = ProjectInfo(projects, args.lust)
     info.printQuotas()
