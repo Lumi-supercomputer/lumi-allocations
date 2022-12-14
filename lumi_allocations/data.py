@@ -36,7 +36,7 @@ class ProjectInfo:
 
     def _makeQuotaString(self, quota, unit):
         if quota["alloc"] == 0:
-            percentage = f"(N/A)"
+            percentage = "(N/A)"
         else:
             percentage = f"({quota['used']/quota['alloc']*100:.1f}%)"
         return f"{quota['used']}/{quota['alloc']} {percentage:>8} {unit}"
@@ -48,9 +48,9 @@ class ProjectInfo:
 
     def printQuotas(self):
         print(
-            f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>34}"
+            f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>30}|{'QPU (used/allocated)':>40}"
         )
-        print("-" * 132)
+        print("-" * 169)
         projects = []
         if self._sort_spec is not None:
             # sort projects according to +/-
@@ -58,7 +58,15 @@ class ProjectInfo:
             #   C (CPU abs used), c (CPU % used)
             #   G (GPU abs used), g (GPU % used)
             #   S (storage abs used), s (storage % used)
-            sort_field = {'n': 0, 'C': 1, 'c': 2, 'G': 3, 'g': 4, 'S': 5, 's': 6,}
+            sort_field = {
+                "n": 0,
+                "C": 1,
+                "c": 2,
+                "G": 3,
+                "g": 4,
+                "S": 5,
+                "s": 6,
+            }
             sorted_projects = []
             for project in self._projects:
                 billing_data = self._data[project]["billing"]
@@ -66,15 +74,23 @@ class ProjectInfo:
                 cpu_hours = billing_data["cpu_hours"]
                 gpu_hours = billing_data["gpu_hours"]
                 # each list item's elements need to be in the order specified in sort_field
-                sorted_projects.append((
-                    project,
-                    cpu_hours["used"],
-                    0 if cpu_hours["alloc"] == 0 else cpu_hours["used"]/cpu_hours["alloc"],
-                    gpu_hours["used"],
-                    0 if gpu_hours["alloc"] == 0 else gpu_hours["used"]/gpu_hours["alloc"],
-                    storage_hours["used"],
-                    0 if storage_hours["alloc"] == 0 else storage_hours["used"]/storage_hours["alloc"],
-                ))
+                sorted_projects.append(
+                    (
+                        project,
+                        cpu_hours["used"],
+                        0
+                        if cpu_hours["alloc"] == 0
+                        else cpu_hours["used"] / cpu_hours["alloc"],
+                        gpu_hours["used"],
+                        0
+                        if gpu_hours["alloc"] == 0
+                        else gpu_hours["used"] / gpu_hours["alloc"],
+                        storage_hours["used"],
+                        0
+                        if storage_hours["alloc"] == 0
+                        else storage_hours["used"] / storage_hours["alloc"],
+                    )
+                )
             msp = []
             for sp in self._sort_spec.split(","):
                 sp_field = ""
@@ -101,6 +117,7 @@ class ProjectInfo:
             storage_hours = billing_data["storage_hours"]
             cpu_hours = billing_data["cpu_hours"]
             gpu_hours = billing_data["gpu_hours"]
+            qpu_secs = billing_data["qpu_secs"]
             print(
-                f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >34}"
+                f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >30}|{self._makeQuotaString(qpu_secs, 'qpu/seconds'): >40}"
             )
