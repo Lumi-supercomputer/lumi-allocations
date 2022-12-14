@@ -9,6 +9,10 @@
       "alloc": 1000,
       "used": 500
     },
+    "qpu_secs": {
+      "alloc": 0,
+      "used": 0
+    },
     "storage_hours": {
       "alloc": 1000,
       "used": 250

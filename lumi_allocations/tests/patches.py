@@ -17,6 +17,10 @@ def gen_data():
                 "used": 1,
                 "alloc": 2,
             },
+            "qpu_secs": {
+                "used": 1,
+                "alloc": 2,
+            },
             "storage_hours": {
                 "used": 1,
                 "alloc": 2,
