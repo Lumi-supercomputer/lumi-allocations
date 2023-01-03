@@ -36,14 +36,15 @@ class ProjectInfo:
 
     def printQuotas(self):
         print(
-            f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>30}"
+            f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>30}|{'QPU (used/allocated)':>40}"
         )
-        print("-" * 128)
+        print("-" * 169)
         for project in self._projects:
             billing_data = self._data[project]["billing"]
             storage_hours = billing_data["storage_hours"]
             cpu_hours = billing_data["cpu_hours"]
             gpu_hours = billing_data["gpu_hours"]
+            qpu_secs = billing_data["qpu_secs"]
             print(
-                f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >30}"
+                f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >30}|{self._makeQuotaString(qpu_secs, 'qpu/seconds'): >40}"
             )
