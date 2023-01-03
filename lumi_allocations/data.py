@@ -8,6 +8,9 @@ class ProjectInfo:
         self._set_path(lust)
         self._set_projects(projects)
         self._set_data()
+        self._has_qpu = any(
+            self._data[p]["billing"]["qpu_secs"]["alloc"] > 0 for p in self._data
+        )
 
     def _set_path(self, lust):
         self._path = f"/var/lib/project_info/{'lust' if lust else 'users'}"
@@ -35,16 +38,19 @@ class ProjectInfo:
         return f"{quota['used']}/{quota['alloc']} {percentage:>8} {unit}"
 
     def printQuotas(self):
-        print(
-            f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>30}|{'QPU (used/allocated)':>40}"
-        )
-        print("-" * 169)
+        header = f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>35}"
+        if self._has_qpu:
+            header = header + f"|{'QPU (used/allocated)':>30}"
+        print(header)
+
+        print("-" * 164 if self._has_qpu else "-" * 134)
         for project in self._projects:
             billing_data = self._data[project]["billing"]
             storage_hours = billing_data["storage_hours"]
             cpu_hours = billing_data["cpu_hours"]
             gpu_hours = billing_data["gpu_hours"]
-            qpu_secs = billing_data["qpu_secs"]
-            print(
-                f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >30}|{self._makeQuotaString(qpu_secs, 'qpu/seconds'): >40}"
-            )
+            line = f"{project: <20}|{self._makeQuotaString(cpu_hours, 'core/hours'): >40}|{self._makeQuotaString(gpu_hours, 'gpu/hours'): >35}|{self._makeQuotaString(storage_hours, 'TB/hours'): >35}"
+            if self._has_qpu:
+                qpu_secs = billing_data["qpu_secs"]
+                line = line + f"|{self._makeQuotaString(qpu_secs, 'qpu/secs'): >30}"
+            print(line)
