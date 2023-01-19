@@ -1,6 +1,7 @@
 import json
 import os
 import grp
+import sys
 
 
 class ProjectInfo:
@@ -28,8 +29,15 @@ class ProjectInfo:
     def _set_data(self):
         self._data = {}
         for project in self._projects:
-            with open(f"{self._path}/{project}/{project}.json") as f:
-                self._data[project] = json.load(f)
+            try:
+                with open(f"{self._path}/{project}/{project}.json") as f:
+                    self._data[project] = json.load(f)
+            except OSError:
+                print(
+                    f"Error: You do not have permissions to access {project}",
+                    file=sys.stderr,
+                )
+                sys.exit(0)
 
     def _makeQuotaString(self, quota, unit):
         if quota["alloc"] == 0:
