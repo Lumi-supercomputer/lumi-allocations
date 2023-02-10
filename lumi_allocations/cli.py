@@ -3,6 +3,7 @@
 from .data import ProjectInfo
 import argparse
 import os
+import grp
 
 
 def main():
@@ -17,18 +18,19 @@ def main():
         default="",
     )
     parser.add_argument(
-        "-a",
-        "--all",
-        help="Return information for all projects.",
-        action="store_true",
-    )
-    parser.add_argument(
         "-s",
         "--sort",
         help="Comma separated sort spec (+/- n(name), c/C (CPU %/abs used), g/G (GPU %/abs used), s/S (storage %/abs used))",
     )
-    parser.add_argument("--lust", action="store_true", help="Special flag for LUST")
+    parser.add_argument("-a", "--all", help=argparse.SUPPRESS, action="store_true")
+    parser.add_argument("--lust", help=argparse.SUPPRESS, action="store_true")
     args = parser.parse_args()
+    if args.lust and "project_462000008" not in [
+        grp.getgrgid(a).gr_name for a in os.getgroups()
+    ]:
+        parser.error("Error: You are not a LUST member")
+    if args.all and not args.lust:
+        parser.error("-a or --all can only be used with --lust")
     projdir = "/projappl"
     projects = []
     not_a_project = {"project_462000009": False, "project_465000002": False}
