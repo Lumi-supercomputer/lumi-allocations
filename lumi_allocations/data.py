@@ -2,6 +2,7 @@ import json
 import os
 import grp
 import sys
+from datetime import datetime
 
 
 class ProjectInfo:
@@ -12,6 +13,21 @@ class ProjectInfo:
         self._has_qpu = any(
             self._data[p]["billing"]["qpu_secs"]["alloc"] > 0 for p in self._data
         )
+        if len(self._projects) == 0:
+            print("Error: No projects were found")
+            sys.exit(0)
+        try:
+            self._last_modified = datetime.fromtimestamp(
+                os.path.getmtime(
+                    f"{self._path}/{self._projects[0]}/{self._projects[0]}.json"
+                )
+            )
+        except OSError:
+            print(
+                "ERROR: Could not access file data",
+                file=sys.stderr,
+            )
+            sys.exit(0)
 
     def _set_path(self, lust):
         self._path = f"/var/lib/project_info/{'lust' if lust else 'users'}"
@@ -46,6 +62,7 @@ class ProjectInfo:
         return f"{quota['used']}/{quota['alloc']} {percentage:>8} {unit}"
 
     def printQuotas(self):
+        print(f"Data updated: {self._last_modified}")
         header = f"{'Project': <20}|{'CPU (used/allocated)':>40}|{'GPU (used/allocated)': >35}|{'Storage (used/allocated)':>35}"
         if self._has_qpu:
             header = header + f"|{'QPU (used/allocated)':>30}"

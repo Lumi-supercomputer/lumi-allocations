@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 import os
 import grp
+import time
 
 import lumi_allocations.data
 
@@ -89,3 +90,8 @@ def patch_set_data(monkeypatch):
         "_set_data",
         mock_set_data,
     )
+
+
+@pytest.fixture
+def patch_getmtime(monkeypatch):
+    monkeypatch.setattr(os.path, "getmtime", lambda _: time.time())
