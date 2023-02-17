@@ -45,5 +45,5 @@ def main():
         projects.sort()
     else:
         projects = [] if args.projects == "" else args.projects.split(",")
-    info = ProjectInfo(projects, args.lust)
+    info = ProjectInfo(projects, args.lust, args.sort)
     info.printQuotas()
