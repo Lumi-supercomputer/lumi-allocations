@@ -17,6 +17,11 @@ def main():
         help="Project numbers comma seperated. Default: all of your projects",
         default="",
     )
+    parser.add_argument(
+        "-s",
+        "--sort",
+        help="Comma separated sort spec (+/- n(name), c/C (CPU %%/abs used), g/G (GPU %%/abs used), s/S (storage %%/abs used))",
+    )
     parser.add_argument("-a", "--all", help=argparse.SUPPRESS, action="store_true")
     parser.add_argument("--lust", help=argparse.SUPPRESS, action="store_true")
     args = parser.parse_args()
@@ -40,5 +45,5 @@ def main():
         projects.sort()
     else:
         projects = [] if args.projects == "" else args.projects.split(",")
-    info = ProjectInfo(projects, args.lust)
+    info = ProjectInfo(projects, args.lust, args.sort)
     info.printQuotas()
